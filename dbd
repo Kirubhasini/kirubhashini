@@ -1,0 +1,246 @@
+master and transaction:
+CREATE TABLE CUSTOMERSS(Trip_No INT PRIMARY KEY,Name VARCHAR(60) NOT NULL,Phone_No INT NOT NULL,Gender VARCHAR(10),Age INT CHECK(AGE>=18));
+INSERT INTO CUSTOMERSS VALUES(1000,'kaviya',9944496325,'female',19);
+INSERT INTO CUSTOMERSS VALUES(1001,'apar',9944496321,'female',20);
+INSERT INTO CUSTOMERSS VALUES(1002,'bhava',9944496335,'female',19);
+INSERT INTO CUSTOMERSS VALUES(1003,'sugi',9944496326,'female',19);
+INSERT INTO CUSTOMERSS VALUES(1004,'siddhu',9944496725,'male',21);
+ 
+
+
+
+#2M
+CREATE TABLE Drivers (DriverID INT PRIMARY KEY,Trip_No INT,DriverLicenseNumber VARCHAR(20),VehicleInformation VARCHAR(255),Rating DECIMAL(3, 2),FOREIGN KEY (Trip_No) REFERENCES CUSTOMERSS(Trip_No));
+INSERT INTO Drivers VALUES(11,1000,'DL12345','MODEL1',4.5);
+INSERT INTO Drivers VALUES(12,1001,'DL12346','MODEL2',4.3);
+INSERT INTO Drivers VALUES(13,1002,'DL12347','MODEL3',4.6);
+INSERT INTO Drivers VALUES(14,1003,'DL12348','MODEL4',4.9);
+INSERT INTO Drivers VALUES(15,1004,'DL12349','MODEL5',4.7);
+ 
+SELECT * FROM Drivers
+
+
+CREATE TABLE Vehicles (VehicleID INT PRIMARY KEY,DriverID INT,VehicleType VARCHAR(50),LicensePlateNumber VARCHAR(15),YearOfManufacture INT,Color VARCHAR(20),FOREIGN KEY (DriverID) REFERENCES Drivers(DriverID));
+INSERT INTO Vehicles VALUES(81,11,'van','ABC1234',2018,'silver');
+INSERT INTO Vehicles VALUES(82,12,'suv','XYZ1235',2019,'white');
+INSERT INTO Vehicles VALUES(83,13,'convertible','SKM1278',2017,'black');
+INSERT INTO Vehicles VALUES(84,14,'compact','LKJ1894',2020,'grey');
+INSERT INTO Vehicles VALUES(85,15,'sedan','PLQ1204',2021,'red');
+ 
+SELECT * FROM Vehicles
+
+
+CREATE TABLE Locations (LocationID INT PRIMARY KEY,Name VARCHAR(255),Pickup VARCHAR(200),Drop_add VARCHAR(200));
+INSERT INTO Locations VALUES(90,'Mall','Loc A','Loc B');
+INSERT INTO Locations VALUES(91,'Park','Loc C','Loc D');
+INSERT INTO Locations VALUES(92,'Cafe','Loc A','Loc D');
+INSERT INTO Locations VALUES(93,'Store','Loc F','Loc B');
+INSERT INTO Locations VALUES(94,'Market','Loc S','Loc F');
+ 
+SELECT * FROM Locations
+
+
+CREATE TABLE RideTypes (RideTypeID INT PRIMARY KEY,Name VARCHAR(50),Description VARCHAR(255),BaseFare DECIMAL(6, 2),RatePerMile DECIMAL(6, 2),RatePerMinute DECIMAL(6, 2));
+INSERT INTO RideTypes VALUES(51, 'Standard', 'Standard Ride', 5.00, 1.25, 0.25);
+INSERT INTO RideTypes VALUES(52, 'Premium', 'Premium Ride', 10.00, 2.50, 0.50);
+INSERT INTO RideTypes VALUES(53, 'Express', 'Express Ride', 7.00, 1.75, 0.35);
+INSERT INTO RideTypes VALUES(54, 'Pool', 'Shared Ride', 4.00, 1.00, 0.20);
+INSERT INTO RideTypes VALUES(55, 'Luxury', 'Luxury Ride', 15.00, 3.75, 0.75);
+ 
+SELECT * FROM RideTypes
+
+
+CREATE TABLE Ride (RideID INT PRIMARY KEY,DriverID INT,RiderID INT,StartLocation INT,EndLocation INT,RideType INT,Distance DECIMAL(8, 2),FareAmount DECIMAL(8, 2),FOREIGN KEY (DriverID) REFERENCES Drivers(DriverID),FOREIGN KEY (RiderID) REFERENCES CUSTOMERSS(Trip_No),FOREIGN KEY (StartLocation) REFERENCES Locations(LocationID),FOREIGN KEY (EndLocation) REFERENCES Locations(LocationID),FOREIGN KEY (RideType) REFERENCES RideTypes(RideTypeID));
+INSERT INTO Ride VALUES(1,11,1000,90,90,51,10.5, 105.00);
+INSERT INTO Ride VALUES(2,12,1001,91,91,52,8.7, 150.00);
+INSERT INTO Ride VALUES(3,13,1002,92,92,53,15.7, 75.00);
+INSERT INTO Ride VALUES(4,14,1003,93,93,54,7.3, 90.00);
+INSERT INTO Ride VALUES(5,15,1004,94,94,55,12.8, 250.50);
+ 
+SELECT * FROM Ride
+
+
+CREATE TABLE Payments (PaymentID INT PRIMARY KEY,RideID INT,PaymentMethod VARCHAR(50),PaymentDate DATE,TotalAmount DECIMAL(8, 2),Status VARCHAR(20),FOREIGN KEY (RideID) REFERENCES Ride(RideID));
+INSERT INTO Payments VALUES(30, 1, 'Credit Card', TO_DATE('2023-10-06','yyyy/mm/dd'), 105.00, 'Paid');
+INSERT INTO Payments VALUES(31, 2, 'Cash', TO_DATE('2023-10-06','yyyy/mm/dd'), 150.00, 'Paid');
+INSERT INTO Payments VALUES(32, 3, 'Paypal', TO_DATE('2023-10-06','yyyy/mm/dd'), 75.00, 'Paid');
+INSERT INTO Payments VALUES(33, 4, 'Credit Card',TO_DATE('2023-10-06','yyyy/mm/dd'), 90.00, 'Paid');
+INSERT INTO Payments VALUES(34, 5, 'Paypal', TO_DATE('2023-10-06','yyyy/mm/dd'), 250.00, 'Paid');
+SELECT * FROM Payments
+
+
+CREATE TABLE RiderReviews (ReviewID INT PRIMARY KEY,RideID INT,RiderID INT,Rating DECIMAL(3, 2),Comments VARCHAR(255),FOREIGN KEY (RideID) REFERENCES Ride(RideID),FOREIGN KEY (RiderID) REFERENCES CUSTOMERSS(Trip_No));
+INSERT INTO RiderReviews VALUES(200,1,1000,4.2,'Great Ride');
+INSERT INTO RiderReviews VALUES(201,2,1001,4.3,'Good');
+INSERT INTO RiderReviews VALUES(202,3,1002,4.5,'Smooth Ride');
+INSERT INTO RiderReviews VALUES(203,4,1003,4.1,'Good Service');
+INSERT INTO RiderReviews VALUES(204,5,1004,4.0,'Excellent');
+ 
+SELECT * FROM RiderReviews
+
+
+CREATE TABLE DriverReviews (ReviewID INT PRIMARY KEY,RideID INT,DriverID INT,Rating DECIMAL(3, 2),Comments VARCHAR(255),FOREIGN KEY (RideID) REFERENCES Ride(RideID), FOREIGN KEY (DriverID) REFERENCES Drivers(DriverID));
+INSERT INTO DriverReviews VALUES(300,1,11,4.5,'Friendly');
+INSERT INTO DriverReviews VALUES(301,2,12,4.6,'Panctual');
+INSERT INTO DriverReviews VALUES(302,3,13,4.4,'Safe');
+INSERT INTO DriverReviews VALUES(303,4,14,4.8,'Excellent');
+INSERT INTO DriverReviews VALUES(304,5,15,4.9,'Friendly');
+ 
+SELECT * FROM DriverReviews
+
+
+CREATE TABLE Promotions (PromotionID INT PRIMARY KEY,Code VARCHAR(20),Description VARCHAR(255),DiscountAmount DECIMAL(6, 2),ExpirationDate DATE);
+INSERT INTO Promotions VALUES(1, 'SAVE10', 'Get 10% off your next ride', 10.00, TO_DATE('2023-12-31','yyyy/mm/dd'));
+INSERT INTO Promotions VALUES(2, 'FIRSTRIDE', 'First-time riders get $5 off', 5.00, TO_DATE('2023-12-31','yyyy/mm/dd'));
+INSERT INTO Promotions VALUES(3, 'WEEKEND25', 'Weekend special: 25% off', 25.00, TO_DATE('2023-11-30','yyyy/mm/dd'));
+INSERT INTO Promotions VALUES(4, 'SUMMERFUN', 'Summer promotion: $15 off', 15.00, TO_DATE('2023-08-31','yyyy/mm/dd'));
+INSERT INTO Promotions VALUES(5, 'FREERIDE', 'Free ride for loyal customers', 20.00, TO_DATE('2023-12-31','yyyy/mm/dd'));
+ 
+SELECT * FROM Promotions
+
+
+CREATE TABLE PromotionRedemptions (RedemptionID INT PRIMARY KEY,RiderID INT,PromotionID INT,RedemptionDate DATE,FOREIGN KEY (RiderID) REFERENCES CUSTOMERSS(Trip_No),FOREIGN KEY (PromotionID) REFERENCES Promotions(PromotionID));
+INSERT INTO PromotionRedemptions VALUES(500,1000,1,TO_DATE('2023-10-10','yyyy/mm/dd'));
+INSERT INTO PromotionRedemptions VALUES(501,1001,2,TO_DATE('2023-10-15','yyyy/mm/dd'));
+INSERT INTO PromotionRedemptions VALUES(502,1002,3,TO_DATE('2023-10-20','yyyy/mm/dd'));
+INSERT INTO PromotionRedemptions VALUES(503,1003,4,TO_DATE('2023-10-24','yyyy/mm/dd'));
+INSERT INTO PromotionRedemptions VALUES(504,1004,5,TO_DATE('2023-10-30','yyyy/mm/dd'));
+ 
+SELECT * FROM PromotionRedemptions
+
+  
+_____sql______
+  SELECT *
+FROM Drivers
+INNER JOIN Vehicles ON Drivers.DriverID = Vehicles.DriverID;
+
+SELECT *
+FROM Drivers
+RIGHT JOIN Vehicles ON Drivers.DriverID = Vehicles.VehicleID;
+
+SELECT *
+FROM Drivers
+LEFT JOIN Vehicles ON Drivers.DriverID = Vehicles.VehicleID;
+
+SELECT *
+FROM Drivers
+OUTER JOIN Vehicles ON Drivers.DriverID = Vehicles.VehichleID;
+
+NESTED
+  SELECT * FROM Promotions WHERE PromotionID IN (
+    SELECT PromotionID FROM PromotionRedemptions
+);
+
+
+SELECT PromotionID, Code, Description, DiscountAmount, ExpirationDate,
+    (SELECT COUNT(*)
+     FROM PromotionRedemptions
+     WHERE PromotionRedemptions.PromotionID = Promotions.PromotionID) AS RedemptionCount
+FROM Promotions;
+
+SELECT DISTINCT PromotionID, Code
+FROM Promotions
+WHERE PromotionID IN (
+    SELECT PromotionID
+    FROM PromotionRedemptions
+    WHERE EXTRACT(YEAR FROM RedemptionDate) = 2023 AND EXTRACT(MONTH FROM RedemptionDate) = 10
+);
+
+PLSQL
+  CREATE OR REPLACE PROCEDURE GetRiderInfo(
+    rider_id_in IN CUSTOMERSS.Trip_No%TYPE,
+    rider_name OUT CUSTOMERSS.Name%TYPE,
+    rider_phone OUT CUSTOMERSS.Phone_No%TYPE,
+    rider_gender OUT CUSTOMERSS.Gender%TYPE,
+    rider_age OUT CUSTOMERSS.Age%TYPE
+)
+AS
+BEGIN
+    SELECT Name, Phone_No, Gender, Age
+    INTO rider_name, rider_phone, rider_gender, rider_age
+    FROM CUSTOMERSS
+    WHERE Trip_No = rider_id_in;
+END;
+
+CREATE OR REPLACE PROCEDURE CalculateDriverAvgRating(
+    driver_id_in IN Drivers.DriverID%TYPE,
+    avg_rating OUT NUMBER
+)
+AS
+BEGIN
+    SELECT AVG(Rating)
+    INTO avg_rating
+    FROM DriverReviews
+    WHERE DriverID = driver_id_in;
+END;
+
+CREATE OR REPLACE PROCEDURE UpdateRiderPhone(
+    rider_id_in IN CUSTOMERSS.Trip_No%TYPE,
+    new_phone_number IN CUSTOMERSS.Phone_No%TYPE
+)
+AS
+BEGIN
+    UPDATE CUSTOMERSS
+    SET Phone_No = new_phone_number
+    WHERE Trip_No = rider_id_in;
+    COMMIT;
+END;
+
+
+CURSOR
+  SET SERVEROUTPUT ON;
+
+DECLARE 
+    rider_name CUSTOMERSS.Name%TYPE;
+    CURSOR rider_cursor IS 
+        SELECT Name FROM CUSTOMERSS;
+BEGIN 
+    OPEN rider_cursor;
+    LOOP 
+        FETCH rider_cursor INTO rider_name;
+        EXIT WHEN rider_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Rider Name: ' || rider_name);
+    END LOOP;
+    CLOSE rider_cursor;
+END;
+/
+
+DECLARE 
+    driver_id INT;
+    CURSOR driver_cursor IS 
+        SELECT DriverID FROM Drivers WHERE Rating < 4.5;
+BEGIN 
+    OPEN driver_cursor;
+    LOOP 
+        FETCH driver_cursor INTO driver_id;
+        EXIT WHEN driver_cursor%NOTFOUND;
+        UPDATE Drivers SET Rating = 4.5 WHERE DriverID = driver_id;
+    END LOOP;
+    CLOSE driver_cursor;
+END;
+
+TRIGGER
+  CREATE OR REPLACE TRIGGER rider_age_trigger
+BEFORE INSERT ON CUSTOMERSS
+FOR EACH ROW
+BEGIN
+    IF :NEW.Age < 18 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Rider must be at least 18 years old.');
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER driver_rating_trigger
+BEFORE UPDATE OF Rating ON Drivers
+FOR EACH ROW
+BEGIN
+    IF :NEW.Rating < 0 THEN
+        :NEW.Rating := 0;
+    ELSIF :NEW.Rating > 5 THEN
+        :NEW.Rating := 5;
+    END IF;
+END;
+/
+
+
+  
